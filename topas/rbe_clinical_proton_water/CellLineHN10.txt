@@ -1,0 +1,7 @@
+# Head-and-neck / early-responding tissue cell line.
+# alpha/beta_x = 10.0 Gy — standard for H&N squamous cell carcinoma and
+# most early-reacting normal tissues.
+# Sources:
+#   Withers et al. (1982), Br J Radiol 55, 513
+#   Bentzen et al. (2007), Lancet Oncol 8, 429
+d:Sc/CellLineHN10/AlphaBetaRatiox = 10.0 Gy

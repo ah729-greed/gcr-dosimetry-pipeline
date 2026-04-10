@@ -1,0 +1,6 @@
+# Prostate / late-responding tissue cell line.
+# alpha/beta_x = 3.0 Gy — widely used for prostate and CNS tumors.
+# Sources:
+#   Brenner & Hall (1999), Int J Radiat Oncol Biol Phys 43, 1095
+#   Dasu & Toma-Dasu (2013), Clin Oncol 25, 506
+d:Sc/CellLineProstate3/AlphaBetaRatiox = 3.0 Gy

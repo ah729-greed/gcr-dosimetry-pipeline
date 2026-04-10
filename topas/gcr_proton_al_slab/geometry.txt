@@ -1,0 +1,53 @@
+# Beam source — 230 MeV proton (pencil beam, no spread)
+s:So/Proton/Type                     = "Beam"
+s:So/Proton/Component                = "World"
+s:So/Proton/BeamParticle             = "proton"
+d:So/Proton/BeamEnergy               = 230 MeV
+s:So/Proton/BeamShape                = "Rectangle"
+d:So/Proton/BeamPositionCutoffX      = 1.0 mm
+d:So/Proton/BeamPositionCutoffY      = 1.0 mm
+s:So/Proton/BeamPositionDistribution = "Flat"
+u:So/Proton/BeamEnergySpread         = 0
+s:So/Proton/BeamAngularDistribution  = "None"
+i:So/Proton/NumberOfHistoriesInRun   = 50000
+
+# World
+d:Ge/World/HLX       = 250 cm
+d:Ge/World/HLY       = 250 cm
+d:Ge/World/HLZ       = 250 cm
+b:Ge/World/Invisible = "TRUE"
+s:Ge/World/Material  = "Air"
+
+# Aluminum shielding slab — 20 g/cm² = 7.407 cm at ρ=2.7 g/cm³
+s:Ge/AlSlab/Parent   = "World"
+s:Ge/AlSlab/Type     = "TsBox"
+s:Ge/AlSlab/Material = "G4_Al"
+d:Ge/AlSlab/HLX      = 50.0 mm
+d:Ge/AlSlab/HLY      = 50.0 mm
+d:Ge/AlSlab/HLZ      = 37.035 mm
+d:Ge/AlSlab/TransX   = 0. m
+d:Ge/AlSlab/TransY   = 0. m
+d:Ge/AlSlab/TransZ   = 37.035 mm
+
+# Water phantom — protons enter after clearing the Al slab
+s:Ge/Phantom/Parent   = "World"
+s:Ge/Phantom/Type     = "TsBox"
+s:Ge/Phantom/Material = "G4_WATER"
+d:Ge/Phantom/HLX      = 50.0 mm
+d:Ge/Phantom/HLY      = 50.0 mm
+d:Ge/Phantom/HLZ      = 150.0 mm
+d:Ge/Phantom/TransX   = 0. m
+d:Ge/Phantom/TransY   = 0. m
+d:Ge/Phantom/TransZ   = 224.07 mm
+
+# Scoring sample inside phantom
+s:Ge/Sample/Parent   = "Phantom"
+s:Ge/Sample/Type     = "TsBox"
+s:Ge/Sample/Material = "G4_WATER"
+d:Ge/Sample/HLX      = 5.0 mm
+d:Ge/Sample/HLY      = 5.0 mm
+d:Ge/Sample/HLZ      = 150.0 mm
+d:Ge/Sample/TransX   = 0. m
+d:Ge/Sample/TransY   = 0. m
+d:Ge/Sample/TransZ   = 0. m
+i:Ge/Sample/ZBins    = 300

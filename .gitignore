@@ -1,0 +1,45 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+.eggs/
+*.ipynb_checkpoints/
+
+# Environment
+.env
+.venv/
+env/
+
+# LaTeX build artifacts
+*.aux
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+*.log
+*.out
+*.synctex.gz
+*.toc
+*.lof
+*.lot
+
+# macOS
+.DS_Store
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Claude Code session data (local only)
+.claude/
+
+# Generated figures (reproducible from notebooks/scripts)
+figures/*.png
+figures/*.pdf
+
+# Keep local — not for public repo
+paper/
+TIMELINE/

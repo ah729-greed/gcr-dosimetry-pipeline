@@ -1,0 +1,21 @@
+# GCR proton / aluminum-slab CSDA transport benchmark.
+#
+# Purpose: validate the Python CSDA range model (transport.proton_range,
+#          transport.energy_after_slab) against Geant4/TOPAS physics.
+#
+# Setup:
+#   - 230 MeV proton beam (top of clinical/space-relevant range)
+#   - 20 g/cm² aluminum slab (representative spacecraft wall)
+#   - Water phantom post-slab: score Bragg peak depth
+#
+# Python validation target:
+#   energy_after_slab(230, 20, 'aluminum') should predict the exit energy
+#   whose residual range in water matches the TOPAS Bragg peak depth to ±5%.
+#
+# Physics list: QGSP_BIC_HP (same as clinical TOPAS defaults)
+i:Ts/NumberOfThreads = 8
+i:Ts/Seed = 314
+i:Ts/ShowHistoryCountAtInterval = 1000
+
+includeFile = geometry.txt
+includeFile = scorers.txt

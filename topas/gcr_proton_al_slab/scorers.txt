@@ -1,0 +1,12 @@
+s:Sc/DoseInWater/Quantity   = "DoseToWater"
+s:Sc/DoseInWater/Component  = "Sample"
+b:Sc/DoseInWater/PreCalculateStoppingPowerRatios = "True"
+s:Sc/DoseInWater/IfOutputFileAlreadyExists = "Overwrite"
+s:Sc/DoseInWater/OutputType = "csv"
+s:Sc/DoseInWater/OutputFile = "results/DoseInWater"
+
+s:Sc/LETinWater/Quantity   = "ProtonLET"
+s:Sc/LETinWater/Component  = "Sample"
+s:Sc/LETinWater/IfOutputFileAlreadyExists = "Overwrite"
+s:Sc/LETinWater/OutputType = "csv"
+s:Sc/LETinWater/OutputFile = "results/LETinWater"

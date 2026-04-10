@@ -1,0 +1,2 @@
+# Minimal V79 cell-line definition for RBE-only benchmarking.
+d:Sc/CellLineV79/AlphaBetaRatiox = 1.412 Gy

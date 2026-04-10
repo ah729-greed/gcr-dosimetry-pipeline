@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+
+env:
+  UNCERTAINTY_SAMPLES: 20   # keep slow tests tractable in CI
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install dependencies
+        run: pip install -e ".[dev]"
+
+      - name: Run tests (excluding slow)
+        run: pytest tests/ -v --tb=short -m "not slow"
+
+      - name: Validate pipeline against MSL RAD + HZETRN
+        run: python scripts/validate_pipeline.py

@@ -1,0 +1,41 @@
+s:Sc/PhysDose/Quantity   = "DoseToWater"
+s:Sc/PhysDose/Component  = "Sample"
+b:Sc/PhysDose/PreCalculateStoppingPowerRatios = "True"
+s:Sc/PhysDose/IfOutputFileAlreadyExists = "Overwrite"
+s:Sc/PhysDose/OutputType = "csv"
+s:Sc/PhysDose/OutputFile = "results/PhysicalDose"
+
+s:Sc/ProtonLET/Quantity   = "ProtonLET"
+s:Sc/ProtonLET/Component  = "Sample"
+s:Sc/ProtonLET/IfOutputFileAlreadyExists = "Overwrite"
+s:Sc/ProtonLET/OutputType = "csv"
+s:Sc/ProtonLET/OutputFile = "results/LET"
+
+s:Sc/OutputQuantity = "RBE"
+d:Sc/PrescribedDose = 4 Gy
+sv:Sc/CellLines     = 1 "CellLineV79"
+b:Sc/SimultaneousExposure = "False"
+
+s:Sc/McNamara/Quantity                   = "RBE_McNamara"
+s:Sc/McNamara/Component                  = "Sample"
+s:Sc/McNamara/OutputQuantity             = Sc/OutputQuantity
+d:Sc/McNamara/PrescribedDose             = Sc/PrescribedDose Gy
+sv:Sc/McNamara/CellLines                 = Sc/CellLines
+b:Sc/McNamara/SimultaneousExposure       = Sc/SimultaneousExposure
+s:Sc/McNamara/OutputType                 = "csv"
+s:Sc/McNamara/OutputFile                 = "results/McNamara_RBE"
+s:Sc/McNamara/IfOutputFileAlreadyExists  = "Overwrite"
+s:Sc/McNamara/ReferencedSubScorer_Dose   = "PhysDose"
+s:Sc/McNamara/ReferencedSubScorer_LET    = "ProtonLET"
+
+s:Sc/Wedenberg/Quantity                  = "RBE_Wedenberg"
+s:Sc/Wedenberg/Component                 = "Sample"
+s:Sc/Wedenberg/OutputQuantity            = Sc/OutputQuantity
+d:Sc/Wedenberg/PrescribedDose            = Sc/PrescribedDose Gy
+sv:Sc/Wedenberg/CellLines                = Sc/CellLines
+b:Sc/Wedenberg/SimultaneousExposure      = Sc/SimultaneousExposure
+s:Sc/Wedenberg/OutputType                = "csv"
+s:Sc/Wedenberg/OutputFile                = "results/Wedenberg_RBE"
+s:Sc/Wedenberg/IfOutputFileAlreadyExists = "Overwrite"
+s:Sc/Wedenberg/ReferencedSubScorer_Dose  = "PhysDose"
+s:Sc/Wedenberg/ReferencedSubScorer_LET   = "ProtonLET"

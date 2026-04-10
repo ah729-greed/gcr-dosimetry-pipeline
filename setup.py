@@ -1,0 +1,24 @@
+from setuptools import setup, find_packages
+
+setup(
+    name='gcr-dosimetry-pipeline',
+    version='0.2.0',
+    author='Aryan',
+    description='Open-source GCR mission dosimetry and organ-risk pipeline',
+    packages=find_packages(),
+    python_requires='>=3.10',
+    install_requires=[line.strip() for line in open('requirements.txt')],
+    entry_points={
+        'console_scripts': [
+            'gcr-dose=gcr.cli:main',
+        ],
+    },
+    extras_require={
+        'dev': [
+            'pytest>=7.4',
+            'hypothesis>=6.0',
+            'sphinx>=7.0',
+            'sphinx-rtd-theme>=1.3',
+        ],
+    },
+)

@@ -1,0 +1,69 @@
+s:Sc/PhysDose/Quantity   = "DoseToWater"
+s:Sc/PhysDose/Component  = "Sample"
+b:Sc/PhysDose/PreCalculateStoppingPowerRatios = "True"
+s:Sc/PhysDose/IfOutputFileAlreadyExists = "Overwrite"
+s:Sc/PhysDose/OutputType = "csv"
+s:Sc/PhysDose/OutputFile = "results/PhysicalDose"
+
+s:Sc/ProtonLET/Quantity   = "ProtonLET"
+s:Sc/ProtonLET/Component  = "Sample"
+s:Sc/ProtonLET/IfOutputFileAlreadyExists = "Overwrite"
+s:Sc/ProtonLET/OutputType = "csv"
+s:Sc/ProtonLET/OutputFile = "results/LET"
+
+s:Sc/OutputQuantity = "RBE"
+d:Sc/PrescribedDose = 2 Gy
+sv:Sc/CellLines     = 2 "CellLineProstate3" "CellLineHN10"
+b:Sc/SimultaneousExposure = "False"
+
+# Prostate3: McNamara
+s:Sc/McNamara_Prostate3/Quantity                   = "RBE_McNamara"
+s:Sc/McNamara_Prostate3/Component                  = "Sample"
+s:Sc/McNamara_Prostate3/OutputQuantity             = Sc/OutputQuantity
+d:Sc/McNamara_Prostate3/PrescribedDose             = Sc/PrescribedDose Gy
+sv:Sc/McNamara_Prostate3/CellLines                 = 1 "CellLineProstate3"
+b:Sc/McNamara_Prostate3/SimultaneousExposure       = Sc/SimultaneousExposure
+s:Sc/McNamara_Prostate3/OutputType                 = "csv"
+s:Sc/McNamara_Prostate3/OutputFile                 = "results/McNamara_Prostate3_RBE"
+s:Sc/McNamara_Prostate3/IfOutputFileAlreadyExists  = "Overwrite"
+s:Sc/McNamara_Prostate3/ReferencedSubScorer_Dose   = "PhysDose"
+s:Sc/McNamara_Prostate3/ReferencedSubScorer_LET    = "ProtonLET"
+
+# Prostate3: Wedenberg
+s:Sc/Wedenberg_Prostate3/Quantity                  = "RBE_Wedenberg"
+s:Sc/Wedenberg_Prostate3/Component                 = "Sample"
+s:Sc/Wedenberg_Prostate3/OutputQuantity            = Sc/OutputQuantity
+d:Sc/Wedenberg_Prostate3/PrescribedDose            = Sc/PrescribedDose Gy
+sv:Sc/Wedenberg_Prostate3/CellLines                = 1 "CellLineProstate3"
+b:Sc/Wedenberg_Prostate3/SimultaneousExposure      = Sc/SimultaneousExposure
+s:Sc/Wedenberg_Prostate3/OutputType                = "csv"
+s:Sc/Wedenberg_Prostate3/OutputFile                = "results/Wedenberg_Prostate3_RBE"
+s:Sc/Wedenberg_Prostate3/IfOutputFileAlreadyExists = "Overwrite"
+s:Sc/Wedenberg_Prostate3/ReferencedSubScorer_Dose  = "PhysDose"
+s:Sc/Wedenberg_Prostate3/ReferencedSubScorer_LET   = "ProtonLET"
+
+# HN10: McNamara
+s:Sc/McNamara_HN10/Quantity                   = "RBE_McNamara"
+s:Sc/McNamara_HN10/Component                  = "Sample"
+s:Sc/McNamara_HN10/OutputQuantity             = Sc/OutputQuantity
+d:Sc/McNamara_HN10/PrescribedDose             = Sc/PrescribedDose Gy
+sv:Sc/McNamara_HN10/CellLines                 = 1 "CellLineHN10"
+b:Sc/McNamara_HN10/SimultaneousExposure       = Sc/SimultaneousExposure
+s:Sc/McNamara_HN10/OutputType                 = "csv"
+s:Sc/McNamara_HN10/OutputFile                 = "results/McNamara_HN10_RBE"
+s:Sc/McNamara_HN10/IfOutputFileAlreadyExists  = "Overwrite"
+s:Sc/McNamara_HN10/ReferencedSubScorer_Dose   = "PhysDose"
+s:Sc/McNamara_HN10/ReferencedSubScorer_LET    = "ProtonLET"
+
+# HN10: Wedenberg
+s:Sc/Wedenberg_HN10/Quantity                  = "RBE_Wedenberg"
+s:Sc/Wedenberg_HN10/Component                 = "Sample"
+s:Sc/Wedenberg_HN10/OutputQuantity            = Sc/OutputQuantity
+d:Sc/Wedenberg_HN10/PrescribedDose            = Sc/PrescribedDose Gy
+sv:Sc/Wedenberg_HN10/CellLines                = 1 "CellLineHN10"
+b:Sc/Wedenberg_HN10/SimultaneousExposure      = Sc/SimultaneousExposure
+s:Sc/Wedenberg_HN10/OutputType                = "csv"
+s:Sc/Wedenberg_HN10/OutputFile                = "results/Wedenberg_HN10_RBE"
+s:Sc/Wedenberg_HN10/IfOutputFileAlreadyExists = "Overwrite"
+s:Sc/Wedenberg_HN10/ReferencedSubScorer_Dose  = "PhysDose"
+s:Sc/Wedenberg_HN10/ReferencedSubScorer_LET   = "ProtonLET"
