@@ -7,7 +7,7 @@ The point of the project is not to claim brand-new physics. The point is to make
 ## Quick Start
 
 ```bash
-git clone <repo-url> && cd gcr-dosimetry-pipeline
+git clone https://github.com/ah729-greed/gcr-dosimetry-pipeline && cd gcr-dosimetry-pipeline
 pip install -e .
 python scripts/download_data.py
 python scripts/validate_pipeline.py
