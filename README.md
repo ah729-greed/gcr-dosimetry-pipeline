@@ -1,6 +1,6 @@
 # GCR Dosimetry Pipeline
 
-An open-source Python pipeline for modeling galactic cosmic ray (GCR) radiation exposure on Mars missions, with organ-dose routing and REID risk estimation. It couples modulated spectra, shielding transport, dose calculation, and mission-level risk reporting into one reproducible codebase. Built by Aryan as a student research project spanning space medicine, astrophysics, and translational radiation physics.
+An open-source Python pipeline for modeling galactic cosmic ray (GCR) radiation exposure on Mars missions, with organ-dose routing and REID risk estimation. It couples modulated spectra, shielding transport, dose calculation, and mission-level risk reporting into one reproducible codebase.
 
 The point of the project is not to claim brand-new physics. The point is to make a serious, transparent, usable tool that turns scattered radiation models into something people can run, inspect, compare, and extend.
 
