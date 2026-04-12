@@ -12,7 +12,7 @@ Came across a paper on the MSL/RAD instrument measuring cosmic ray dose during t
 Got very interested and started to study it. Ordered a copy of Schimmerling's space radiation biology textbook. Started taking notes.
 
 ### Sep 12
-Deep dive into the physics stack: what actually goes into computing that 1.84 mGy/day number. Worked backwards from the published value through the transport chain — GCR spectrum → force-field modulation → Bethe-Bloch stopping → dose integration. 
+Deep dive into the physics stack: what actually goes into computing that 1.84 mGy/day number. Worked backwards from the published value through the transport chain : GCR spectrum → force-field modulation → Bethe-Bloch stopping → dose integration. 
 
 Started a physical notebook for the math: derivation of the Gleeson-Axford force-field formula. The modulation potential in MV, the LIS at Earth vs interstellar, the flux suppression below ~500 MeV. Took several sessions to feel like I actually understand what's going on.
 
@@ -26,7 +26,7 @@ Got the Cucinotta (2013) NASA risk model document and started working through th
 ## October 2025
 
 ### Oct 4
-Continued studying. Finished the first pass through the Cucinotta report. Started on shielding physics — why aluminum is okay but polyethylene is better (hydrogen content), why there's a diminishing returns curve, what HZETRN adds.
+Continued studying. Finished the first pass through the Cucinotta report. Started on shielding physics, found why aluminum is okay but polyethylene is better (hydrogen content), why there's a diminishing returns curve, what HZETRN adds.
 
 Read Zeitlin (2013) end to end, including the supplemental. Also Mrigakshi (2013) and Slaba (2014) for the HZETRN comparison data. 
 
