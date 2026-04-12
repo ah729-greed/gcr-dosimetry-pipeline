@@ -20,6 +20,7 @@ Started a physical notebook for the math: derivation of the Gleeson-Axford force
 Spent most of this stretch on nuclear physics. Bethe-Bloch stopping power, effective charge (Barkas parameterization), CSDA range tables. Started finding out the immense problems that heavy ions cause: iron at 457 MeV/n has a LET of ~150 keV/µm, Q ≈ 25. One iron nucleus deposits as much biological damage as 25 equivalent-dose protons!!!
 
 Got the Cucinotta (2013) NASA risk model document and started working through the ERR/EAR formalism. 
+
 ---
 
 ## October 2025
