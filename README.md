@@ -116,7 +116,7 @@ The main takeaway: improving GCR transport physics will narrow dose uncertainty 
 ## Running the tests
 
 ```bash
-pytest                                 # 82 unit tests
+pytest                                 # 103 unit tests
 python scripts/validate_pipeline.py   # dose rate, Q_eff, Al/PE ratio
 python scripts/validate_extended.py   # LHS ensemble + variance decomposition
 python scripts/validate_rbe.py        # Wedenberg and McNamara vs TOPAS-nBio

@@ -2,8 +2,10 @@ from setuptools import setup, find_packages
 
 setup(
     name='gcr-dosimetry-pipeline',
-    version='0.2.0',
-    author='Aryan',
+    version='1.0.0',
+    author='Aryan Hemendra Shah',
+    author_email='ahs222@miami.edu',
+    url='https://github.com/aryanhshah8/gcr-dosimetry-pipeline',
     description='Open-source GCR mission dosimetry and organ-risk pipeline',
     packages=find_packages(),
     python_requires='>=3.10',
