@@ -104,7 +104,7 @@ the results.
 \label{sec:lis}
 
 \paragraph{Protons.}
-The LIS for protons follows the parameterization of \citet{vos2015}:
+The LIS for protons follows the parameterization of Vos \& Potgieter \cite{vos2015}:
 \begin{equation}
   J_\mathrm{LIS}^\mathrm{H}(E) = C_\mathrm{H}
   \cdot \frac{(E_\mathrm{GeV} + 0.67)^{-3.93}}{\beta^2},
@@ -131,7 +131,7 @@ flux at high energies.
 
 \paragraph{Heavy ions.}
 Carbon, oxygen, silicon, and iron LIS parametrizations follow the per-species
-HelMod model of \citet{boschini2020}, which provides explicit spectral indices
+HelMod model of Boschini et al.\ \cite{boschini2020}, which provides explicit spectral indices
 and normalizations for each species fit to ACE, PAMELA, and AMS-02 data:
 \begin{equation}
   J_\mathrm{LIS}^{(s)}(E_n) = C_s \cdot
@@ -147,8 +147,8 @@ The adopted spectral parameters are summarized in Table~\ref{tab:lis_params}.
 \begin{table}[H]
   \centering
   \caption{LIS spectral parameters used in \code{gcr/spectrum.py}.
-           Proton and helium from \citet{vos2015}; heavy ions from
-           \citet{boschini2020}.}
+           Proton and helium from Vos \& Potgieter \cite{vos2015}; heavy ions from
+           Boschini et al.\ \cite{boschini2020}.}
   \label{tab:lis_params}
   \begin{tabular}{lcccl}
     \toprule
@@ -369,7 +369,7 @@ where $\dot{H}_n^\mathrm{Al}(\phi)$ is the neutron dose equivalent rate for
 aluminum at a reference thickness, $f_\mathrm{mat}$ is a material-dependent
 yield factor (polyethylene $\approx 0.72\times$ aluminum due to lower spallation
 cross-sections), and $g(x)$ is an interpolated depth-dependence from the
-HZETRN benchmark dataset of \citet{slaba2014}.
+HZETRN benchmark dataset of Slaba et al.\ \cite{slaba2014}.
 The neutron quality factor is taken as $Q_n = 10$ (ICRP-60), which is a
 weighted average over the neutron energy spectrum in shielding geometries.
 
@@ -501,7 +501,7 @@ procedure and should not be taken as an independent confirmation.
 Cancer mortality risk is quantified as the Radiation Exposure in Incidence of
 Death (REID), defined as the probability that a crew member will die of
 radiation-induced cancer as a consequence of their mission exposure.
-The pipeline implements the \citet{cucinotta2013} organ-specific risk model
+The pipeline implements the Cucinotta et al.\ \cite{cucinotta2013} organ-specific risk model
 (NASA/TP-2013-217375), which was NASA's primary operational risk framework
 through the early 2020s and remains the most widely cited basis for
 published mission REID estimates.
@@ -540,7 +540,7 @@ where $\lambda_c^\mathrm{background}$ is the age-dependent baseline cancer
 mortality rate (from SEER registry data for US males/females),
 and EAR and ERR are organ-specific functions of absorbed dose $D$,
 age at exposure $a_e$, and attained age $a$, taken from
-Tables~2--3 of \citet{cucinotta2013}.
+Tables~2--3 of Cucinotta et al.\ \cite{cucinotta2013}.
 
 The DDREF is applied to reduce the risk at low dose rates:
 \begin{equation}
@@ -587,7 +587,7 @@ where $E_\mathrm{trans} = (\gamma_\ell - \gamma_h) E_b$ is the transition energy
 $\gamma_\ell$ and $\gamma_h$ are the low- and high-energy spectral indices,
 and $C$ is a normalization constant.
 
-Three canonical events are modeled with parameters from \citet{tylka2006}
+Three canonical events are modeled with parameters from Tylka \& Dietrich \cite{tylka2006}
 and references therein (Table~\ref{tab:sep_events}).
 The August~1972 event is included as a historical worst-case;
 it predates modern space dosimetry and its spectrum is reconstructed
@@ -694,7 +694,7 @@ The lognormal distributions for the three radiobiological parameters
 and the fact that they cannot be negative.
 They are parameterized such that the 95th percentile is approximately
 $1.8\times$ the median, consistent with the stated uncertainty bounds
-in \citet{cucinotta2013}.
+in Cucinotta et al.\ \cite{cucinotta2013}.
 
 \subsubsection{Ensemble Execution}
 \label{sec:ensemble}
@@ -789,7 +789,7 @@ with:
                                 \overline{L}_D, \label{eq:rbemin}
 \end{align}
 where $(p_1, p_2, p_3, p_4) = (0.999064, 0.35605, 1.1012, -0.0038703)$
-are from \citet{mcnamara2015}.
+are from McNamara et al.\ \cite{mcnamara2015}.
 Both models are implemented to match the OpenTOPAS-RBE scorer
 conventions exactly, enabling direct numerical comparison.
 
