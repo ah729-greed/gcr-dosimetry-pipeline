@@ -41,26 +41,37 @@ cases.
 
 ## What Uncertainty Is Already Represented
 
-The current REID Monte Carlo in `gcr.reid` perturbs:
+There are currently two uncertainty layers in the codebase:
 
+- `gcr.reid` perturbs quality-factor scaling, ERR scaling, DDREF, and EAR scaling
+- `gcr.uncertainty` runs an 8-parameter Latin Hypercube ensemble spanning both
+  physics and biology inputs
+
+The full LHS ensemble currently varies:
+
+- solar modulation scale
+- LIS normalization
+- nuclear cross-section scale
+- neutron yield scale
 - quality-factor scaling
-- ERR scaling
 - DDREF
+- ERR scaling
 - EAR scaling
 
-This means the project already captures a real part of the biology/risk
-uncertainty.
+This means the project already captures a meaningful first-pass
+`physics + biology` uncertainty envelope rather than only a biology-side REID
+Monte Carlo.
 
 ## What Uncertainty Is Not Yet Fully Represented
 
-The following are still mostly handled through calibration, benchmarking, or
-qualitative caveats rather than a full ensemble:
+The following are still handled approximately, with simplified priors, or via
+benchmarking / caveats rather than a more complete uncertainty model:
 
-- LIS normalization and species composition uncertainty
-- solar modulation uncertainty along the trajectory
-- charged-fragment production uncertainty
-- neutron yield / spectral uncertainty
+- charged-fragment production and species redistribution
+- detailed neutron spectral / geometry uncertainty
 - Mars surface transport uncertainty
+- uncertainty in the underlying epidemiologic life-table / background-risk inputs
+- interaction effects beyond the current rank-based variance decomposition
 
 That is why the current project should be described as:
 
@@ -70,12 +81,13 @@ and not as a fully first-principles radiation transport code.
 
 ## Best Next Uncertainty Upgrade
 
-The most useful next step is a proper `physics + biology` ensemble:
+The most useful next step is not adding uncertainty from scratch, but
+strengthening the current ensemble:
 
-1. vary species/LIS normalization
-2. vary neutron yield scaling
-3. vary REID biological parameters
-4. report dose and REID percentile bands together
+1. replace coarse scale factors with better-anchored parameter priors
+2. add fragmentation-sensitive transport uncertainty
+3. improve the epidemiologic background-risk and survival inputs
+4. report interaction-aware sensitivity metrics alongside the current rank-based decomposition
 
-That would make the risk output much more publication-ready without pretending
-the underlying transport is fully exact.
+That would make the risk output more publication-ready without pretending the
+underlying transport is fully exact.

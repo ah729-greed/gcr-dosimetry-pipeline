@@ -41,5 +41,4 @@ figures/*.png
 figures/*.pdf
 
 # Keep local — not for public repo
-paper/
 TIMELINE/

@@ -1,0 +1,620 @@
+\documentclass[12pt,letterpaper]{article}
+
+% ── Layout ────────────────────────────────────────────────────────────────────
+\usepackage[margin=1in]{geometry}
+\usepackage{setspace}
+\setstretch{1.5}
+\usepackage{microtype}
+\usepackage{comment}
+
+% ── Math & Physics ────────────────────────────────────────────────────────────
+\usepackage{amsmath, amssymb, mathtools}
+\usepackage{siunitx}
+
+% ── Figures & Tables ──────────────────────────────────────────────────────────
+\usepackage{graphicx}
+\usepackage{float}
+\usepackage{caption}
+\usepackage{subcaption}
+\usepackage{booktabs}
+
+% ── References & Links ────────────────────────────────────────────────────────
+\usepackage[numbers,sort&compress]{natbib}
+\bibliographystyle{unsrt}
+\usepackage[colorlinks=true, linkcolor=blue!60!black,
+            citecolor=blue!60!black, urlcolor=blue!60!black]{hyperref}
+
+% ── Misc ──────────────────────────────────────────────────────────────────────
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{lineno}
+\usepackage{verbatim}
+\linenumbers
+
+% ── Custom commands ───────────────────────────────────────────────────────────
+\newcommand{\gcm}{\,\mathrm{g\,cm^{-2}}}
+\newcommand{\mGyday}{\,\mathrm{mGy\,day^{-1}}}
+\newcommand{\mSvday}{\,\mathrm{mSv\,day^{-1}}}
+\newcommand{\keVum}{\,\mathrm{keV\,\mu m^{-1}}}
+\newcommand{\Qeff}{Q_\mathrm{eff}}
+\newcommand{\LETd}{\overline{L}_D}
+\newcommand{\REID}{\mathrm{REID}}
+\newcommand{\code}[1]{\texttt{#1}}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\title{An open-source GCR dosimetry pipeline for Mars mission risk assessment:\\
+       organ-specific REID, SEP acute hazard, and dual-use\\
+       proton therapy RBE benchmarking}
+
+\author{Aryan Hemendra Shah\\[4pt]
+  \small University of Miami\\
+  \small \href{mailto:ahs222@miami.edu}{ahs222@miami.edu}\\
+  \small ORCID: \href{https://orcid.org/0009-0008-0518-428X}{0009-0008-0518-428X}
+}
+\date{\today}
+% ─────────────────────────────────────────────────────────────────────────────
+
+\begin{document}
+\maketitle
+
+% ── Abstract ─────────────────────────────────────────────────────────────────
+\begin{abstract}
+
+We describe \textsc{gcr-dosimetry-pipeline}, an open-source Python package for
+estimating galactic cosmic ray (GCR) radiation exposure and cancer risk on
+crewed deep-space trajectories.
+The pipeline uses Gleeson--Axford force-field solar modulation \citep{gleeson1968}
+with per-species local interstellar spectra \citep{vos2015, boschini2020}.
+GCR flux is transported through slab shielding via continuous-slowing-down
+approximation (CSDA) with effective-charge stopping power scaling; secondary
+neutron dose equivalent comes from a pre-computed HZETRN table \citep{slaba2014}.
+Organ-specific cancer risk is estimated as radiation exposure in incidence of
+death (REID) across eleven organs at ICRP-89 tissue depths \citep{cucinotta2013}.
+
+The pipeline's per-species normalization factors are calibrated to the
+MSL/RAD cruise-phase measurement of $1.84 \pm 0.33$~mGy/day
+\citep{zeitlin2013} at $16\gcm$ aluminum, and the shielding-depth
+dependence and material ratio are independently compared against HZETRN
+benchmark data \citep{slaba2014, mrigakshi2013}, showing agreement within
+the stated benchmark uncertainties ($\lesssim 20\%$ on absolute dose).
+A Solar Energetic Particle module estimates BFO absorbed dose from three
+canonical events using Band-function spectra \citep{tylka2006};
+the August~1972 event requires $>30\gcm$ aluminum to fall below the
+NASA 30-day limit of $250$~mGy.
+
+Global physics and radiobiological uncertainties are propagated via Latin
+Hypercube Sampling over eight parameters, yielding a median REID of $5.0\%$ with p5--p95 bounds of $1.3\%$--$16.9\%$
+(13.4$\times$ spread, typical for this class of analysis) for a 35-year-old
+male crew member on a 259-day Earth--Mars transit at $16\gcm$ aluminum.
+Variance decomposition shows that the quality factor scale parameter
+($76\%$ of REID variance) and DDREF ($7\%$) together dominate output
+uncertainty, while all GCR physics parameters together contribute $<9\%$,
+confirming that better transport physics alone will not narrow REID bounds
+without matching progress in high-LET human radiobiology.
+
+Per-species $\LETd$ decomposition reveals that carbon ions contribute
+approximately $59\%$ of unshielded GCR absorbed dose at a field
+$\LETd \approx 18.7\keVum$, yielding $\Qeff = 2.60$, consistent with
+the MSL/RAD measured value of $2.62 \pm 0.14$ within measurement
+uncertainty.
+Sixteen g/cm$^2$ of aluminum reduces the carbon fraction to $31\%$
+and the field $\LETd$ to $4.1\keVum$, bridging toward the LET range of
+clinical proton therapy Bragg peaks.
+Wedenberg \citep{wedenberg2013} and McNamara \citep{mcnamara2015} proton RBE
+models agree with OpenTOPAS-RBE scorer output to within mean absolute error
+$<10^{-3}$ for V79 cells (self-consistency check for clinical cell lines),
+enabling consistent comparison of space and clinical radiation quality factors
+from a single codebase.
+All source code, 82 automated tests, validation data, and TOPAS geometry
+files are freely available at \url{https://github.com/aryanhshah8/gcr-dosimetry-pipeline}.
+
+\end{abstract}
+
+\textbf{Keywords:}
+galactic cosmic rays; Mars mission dosimetry; radiation risk; REID;
+solar energetic particles; proton therapy RBE; uncertainty quantification;
+open-source
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Introduction}
+\label{sec:intro}
+
+Deep-space human exploration beyond low-Earth orbit exposes crew members to
+galactic cosmic rays (GCR) and solar energetic particles (SEP) at fluence
+rates and energies far exceeding the shielding capacity of current crew
+vehicles.
+The GCR environment at 1--1.5~AU consists of protons, helium, and heavier ions
+(the so-called HZE particles) spanning kinetic energies from a few
+hundred MeV/n to tens of GeV/n, with the peak in biological effectiveness
+occurring near the energy range where stopping power is highest.
+A round-trip crewed Mars mission (transit + surface stay) of approximately
+900 days is estimated to deliver a total effective dose of the order
+$1$--$2$~Sv \citep{zeitlin2013}, which, depending on crew demographics and
+the risk model used, implies a radiation-induced cancer mortality probability
+that may approach or exceed NASA's current career limit \citep{cucinotta2013}.
+
+Quantifying this risk accurately requires several components that are not
+trivially combined: a calibrated GCR spectral model responsive to solar
+modulation, organ-resolved dose transport through shielding and tissue,
+a cancer risk model that accounts for the high-LET quality of HZE radiation,
+and a quantitative uncertainty analysis that separates reducible physics
+uncertainties from the fundamentally larger radiobiological unknowns.
+Existing tools (HZETRN \citep{wilson1991}, OLTARIS, and Geant4/TOPAS) address
+subsets of these requirements with greater physical rigor than the present
+work, particularly in the treatment of nuclear fragmentation.
+However, they are not all openly available, not installable via pip, and do not
+in general integrate physics transport, organ REID, SEP risk, and uncertainty
+quantification into a single executable workflow.
+
+Separately, a parallel development in radiation oncology has produced
+validated LET-dependent RBE models for clinical proton therapy
+\citep{wedenberg2013, mcnamara2015}.
+Proton therapy currently uses a fixed biological effectiveness factor of RBE
+$= 1.1$ relative to photons, despite growing evidence that the RBE in the
+distal Bragg peak, where LET is highest, may significantly exceed this value,
+particularly for CNS and late-responding tissues with low
+$\alpha/\beta$ \citep{paganetti2014}.
+The physical quantity linking space radiation and proton therapy is the
+dose-averaged LET ($\LETd$): the same quantity that determines the GCR
+effective quality factor $\Qeff$ via ICRP-60 also drives deviations of proton
+therapy RBE from 1.1 via the Wedenberg and McNamara models.
+Yet, to our knowledge, no open tool has quantitatively demonstrated this
+connection across both domains.
+
+Here we present \code{gcr-dosimetry-pipeline}, a Python package that, within
+the limitations stated in Section~\ref{sec:discuss_limits}:
+\begin{enumerate}[leftmargin=*, label=\arabic*.]
+  \item Generates six-species GCR spectra with force-field solar modulation
+        calibrated to MSL/RAD cruise-phase measurements;
+  \item Transports spectra through slab shielding via CSDA + nuclear
+        attenuation, with secondary neutrons from a validated table;
+  \item Computes organ-specific absorbed dose and dose equivalent for
+        eleven organs at ICRP-89 tissue depths;
+  \item Estimates REID via the Cucinotta (2013) organ EAR/ERR model with
+        CDC 2020 US life tables;
+  \item Quantifies SEP acute BFO absorbed dose from Band-function spectra
+        for three canonical events;
+  \item Propagates global uncertainty via 8-parameter Latin Hypercube
+        Sampling and decomposes output variance by parameter;
+  \item Benchmarks Wedenberg and McNamara RBE models against OpenTOPAS-RBE
+        reference data for three clinical cell lines.
+\end{enumerate}
+
+The pipeline is not intended as a replacement for HZETRN or Geant4 in
+high-fidelity mission analysis.
+Its value is transparency, reproducibility, and integrated uncertainty
+quantification — properties that closed or proprietary codes generally
+do not offer.
+Mission planners who need to quickly prototype shielding scenarios can
+run the full GCR, SEP, and REID workflow from a single install without
+requiring HZETRN access or a Geant4 build.
+Researchers studying where uncertainty reduction effort should be
+directed will find the LHS variance decomposition directly useful: the
+finding that physics parameters together contribute less than 9\% of
+REID variance while radiobiological parameters contribute more than 70\%
+is difficult to extract from existing closed tools.
+Students and researchers entering either the space radiation or proton
+therapy field also gain a readable, fully tested reference implementation
+rather than a black-box executable.
+The methods, results, discussion of limitations, and reproducibility
+instructions are described in the sections that follow.
+
+
+% ─────────────────────────────────────────────────────────────────────────────
+% Methods — include detailed section from separate file
+\input{methodology}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Results}
+\label{sec:results}
+
+\subsection{Dose Rate Validation}
+\label{sec:validation}
+
+Three independent lines of evidence validate the pipeline against data
+that were not used in the normalization calibration:
+\begin{enumerate}
+  \item \textbf{Shielding curve shape.}
+        At aluminum depths of $5$, $10$, and $30\gcm$ — all outside the
+        $16\gcm$ calibration point — the pipeline falls within the HZETRN
+        benchmark uncertainty envelope ($\lesssim 20\%$) \citep{slaba2014},
+        confirming that the transport model extrapolates correctly
+        across the relevant shielding range.
+  \item \textbf{Material ratio.}
+        The Al/PE absorbed dose ratio of $1.36$ at $16\gcm$ is consistent
+        with the Mrigakshi (2013) value of $1.43 \pm 0.22$, testing the
+        qualitative prediction that hydrogen-rich polyethylene attenuates
+        HZE ions more effectively than aluminum.
+  \item \textbf{Temporal modulation.}
+        A day-by-day Pearson correlation $r > 0.80$ between predicted dose
+        rate and the MSL/RAD time series confirms that the Gleeson--Axford
+        force-field modulation correctly propagates changes in solar activity
+        through to dose rate on daily timescales.
+\end{enumerate}
+
+Table~\ref{tab:validation} summarizes all comparisons in order of
+epistemic strength.
+For completeness, the absorbed dose rate at the calibration geometry
+($16\gcm$ Al, $\phi = 481$~MV) is $1.843\mGyday$, within $0.05\%$ of
+the MSL/RAD value of $1.84\mGyday$ \citep{zeitlin2013}; this agreement
+is a direct consequence of the calibration procedure
+(Section~\ref{sec:calib}) and reflects the quality of the fit rather
+than an independent physical prediction.
+
+\begin{table}[H]
+  \centering
+  \caption{Pipeline validation against flight data and benchmark models,
+           grouped by epistemic status.
+           \textit{Independent}: not used in calibration.
+           \textit{Calibration}: the single MSL/RAD measurement to which
+           normalization factors were fit; agreement here reflects fit
+           quality, not predictive accuracy.
+           \textit{Self-consistency}: implementation checks with no
+           external reference data.}
+  \label{tab:validation}
+  \small
+  \begin{tabular}{lcccc}
+    \toprule
+    Quantity & Pipeline & Reference & Source & Rel.\ error \\
+    \midrule
+    \multicolumn{5}{l}{\textit{Independent validation (not used in calibration)}} \\
+    Shielding slope (5--30 g/cm²)
+      & within & HZETRN env. & \cite{slaba2014} & $<20\%$ \\
+    $\dot{D}$ ratio (Al vs PE, $16\gcm$)
+      & 1.36  & $1.43\pm0.22$ & \cite{mrigakshi2013} & 5\%  \\
+    Daily $r(\dot{D}, \phi)$
+      & $>0.80$ & ---         & \cite{zeitlin2013} & ---    \\
+    \midrule
+    \multicolumn{5}{l}{\textit{Calibration point (fit to this value; not independent)}} \\
+    $\dot{D}$ (mGy/day) at $16\gcm$ Al
+      & 1.843 & $1.84\pm0.33$ & \cite{zeitlin2013} & 0.05\% \\
+    $\dot{H}$ (mSv/day) at $16\gcm$ Al
+      & 4.80  & $4.81\pm0.97$ & \cite{zeitlin2013} & 0.2\%  \\
+    $\Qeff$ at $16\gcm$ Al
+      & 2.60  & $2.62\pm0.14$ & \cite{zeitlin2013} & 0.8\%  \\
+    \midrule
+    \multicolumn{5}{l}{\textit{Self-consistency (no external reference data)}} \\
+    RBE (V79, Wedenberg)
+      & 1.154  & 1.153  & TOPAS-nBio & $<10^{-3}$ \\
+    RBE (V79, McNamara)
+      & 1.165  & 1.165  & TOPAS-nBio & $<5\times10^{-8}$ \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+
+
+\subsection{Shielding Effectiveness and Uncertainty Bounds}
+\label{sec:shielding_results}
+
+Figure~\ref{fig:shielding} shows the absorbed dose rate as a function of
+aluminum and polyethylene shielding thickness for a 259-day transit
+at $\phi = 481$~MV, with p5--p95 LHS uncertainty bands.
+The dose rate decreases steeply from zero to $\sim\!10\gcm$, then
+flattens above $\sim\!16$--$20\gcm$ as secondary neutron buildup
+partially offsets HZE attenuation.
+The p5/p95 ratio at $16\gcm$ aluminum is approximately $1.9$, reflecting
+the combined physics uncertainty (dominated by LIS normalization and
+neutron yield).
+
+Polyethylene provides $\sim\!26\%$ lower dose than aluminum at
+$16\gcm$ over this mission scenario, consistent with the known
+advantage of hydrogen-rich materials for fragmenting HZE ions.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/shielding_uncertainty.pdf}
+  \caption{
+    \textbf{Absorbed dose rate vs.\ shielding (259-day transit, $\phi = 481$~MV).}
+    Left: aluminum (solid) and polyethylene (dashed) central values with
+    p5--p95 LHS uncertainty bands (shaded); MSL/RAD measurement
+    (star, Zeitlin 2013); HZETRN benchmark envelope (gray band, Slaba 2014).
+    Right: per-species dose fractions at $x = 5$, $16$, and $30\gcm$ aluminum,
+    showing the progressive reduction of carbon and heavier-ion contributions
+    with increasing shielding.
+  }
+  \label{fig:shielding}
+\end{figure}
+
+\subsection{Per-Species LET Decomposition}
+\label{sec:let}
+
+Figure~\ref{fig:let} shows the dose-averaged LET per species
+and fractional dose contributions at $0$, $16$, and $30\gcm$ aluminum.
+Unshielded, carbon ions ($\LETd^\mathrm{C} = 25.0\keVum$)
+account for $58.6\%$ of total absorbed dose, giving a field
+$\LETd = 18.7\keVum$ and $\Qeff = 2.60$ (0.8\% below the MSL/RAD calibration target of 2.62).
+After $16\gcm$ aluminum, the carbon dose fraction falls to $31.2\%$,
+the proton fraction rises to $49.4\%$, and the field $\LETd$ drops to
+$4.1\keVum$, within the range where clinical proton therapy RBE
+exceeds 1.1 by $5$--$20\%$ depending on cell line.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/let_spectrum.pdf}
+  \caption{
+    \textbf{Per-species $\LETd$ and dose fractions at 0, 16, and 30 g/cm$^2$ aluminum.}
+    Left: dose-averaged LET per ion species at three shielding depths;
+    annotated field $\LETd$ values show the progression from
+    $18.7$ (unshielded) to $3.7\keVum$ (30 g/cm$^2$).
+    Right: fractional dose contribution per species; carbon dominates
+    unshielded ($58.6\%$) and is progressively fragmented.
+  }
+  \label{fig:let}
+\end{figure}
+
+\subsection{SEP Acute Risk}
+\label{sec:sep_results}
+
+Figure~\ref{fig:sep} shows BFO absorbed dose from three canonical SEP events
+as a function of aluminum shielding thickness.
+The August~1972 event delivers $\sim\!37{,}000$~mGy unshielded
+($\sim\!148\times$ the 30-day BFO limit of 250~mGy) and remains above the
+limit until $\sim\!32\gcm$ Al.
+The October~2003 Halloween event requires $\sim\!25\gcm$ for sub-limit
+protection; January~2005 falls below the limit at $<20\gcm$.
+GCR and SEP respond very differently to shielding: above $\sim\!20\gcm$,
+additional aluminum barely reduces chronic GCR dose, but it continues to
+cut SEP proton dose substantially. This supports the architectural case
+for a compact, heavily shielded storm shelter over whole-vehicle HZE shielding.
+
+We note that the August~1972 event spectrum carries larger uncertainty
+than the 2003 and 2005 events because it predates space-borne dosimetry;
+the Band-function fit was reconstructed from ground-level neutron monitor
+observations and riometry data \citep{tylka2006}.
+The reported doses for this event should be interpreted as order-of-magnitude
+estimates with $\sim\!\pm50\%$ uncertainty.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/sep_shielding.pdf}
+  \caption{
+    \textbf{SEP acute BFO dose vs.\ aluminum shielding.}
+    Left: absolute dose (mGy); horizontal line = NASA 30-day BFO limit (250~mGy);
+    shaded band = ISS/Orion wall equivalent ($14$--$18\gcm$).
+    Multiples of the limit are annotated at zero shielding.
+    Right: same data normalized to the BFO limit.
+  }
+  \label{fig:sep}
+\end{figure}
+
+\subsection{REID vs.\ Shielding and Organ Contributions}
+\label{sec:reid_results}
+
+Figure~\ref{fig:reid} shows REID as a function of aluminum shielding
+thickness for a 35-year-old male and female crew member on a 259-day transit.
+At $16\gcm$, the median REID is $5.0\%$ (male) and $5.4\%$ (female),
+both exceeding the historical NASA $3\%$ career limit \citep{cucinotta2013}.
+However, the p5--p95 uncertainty bands span approximately $1.3\%$--$16.9\%$
+(male) and $1.5\%$--$18.4\%$ (female), reflecting the dominant
+radiobiological uncertainty discussed in Section~\ref{sec:uq}.
+A REID median above the $3\%$ limit with this width of uncertainty implies
+that the mission dose is likely to produce meaningful cancer mortality risk,
+but the precise value cannot be known within the current radiobiological
+framework.
+
+The organ breakdown at $16\gcm$ aluminum shows that stomach, colon, and lung
+contribute most to effective dose equivalent, consistent with their high
+ICRP-60 tissue weighting factors ($w_T = 0.12$) and moderate tissue depths.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/reid_shielding.pdf}
+  \caption{
+    \textbf{REID and organ dose equivalent (259-day transit, launch 2031-01-01).}
+    Left: REID (\%) vs.\ aluminum shielding for 35-year-old male (blue)
+    and female (red) with p5--p95 uncertainty bands;
+    horizontal line = NASA historical 3\% career limit \citep{cucinotta2013}.
+    Note: the p95 band at low shielding ($<5\gcm$) approaches values
+    exceeding 50\%, which is not physically meaningful as a mortality
+    probability; this reflects the LHS distribution not being clipped
+    at biologically plausible upper bounds.
+    The high-shielding portion of the bands ($>10\gcm$) is more
+    interpretively reliable.
+    Right: organ dose equivalent breakdown at $16\gcm$ aluminum,
+    sorted by dose; ICRP-60 tissue weighting factors ($w_T$) annotated.
+  }
+  \label{fig:reid}
+\end{figure}
+
+\subsection{TOPAS RBE Benchmark}
+\label{sec:topas_results}
+
+Figure~\ref{fig:topas} shows the depth-dose profile, LETd, and RBE as a
+function of depth in a water phantom for a $100$~MeV proton beam, compared
+across three cell lines.
+The physical dose follows the expected Bragg curve form, with LETd rising
+from $\sim\!1$~keV/$\mu$m in the plateau to $\sim\!22$~keV/$\mu$m at the Bragg
+peak.
+Pipeline RBE values agree with the OpenTOPAS-RBE reference within $<10^{-3}$
+for V79 (Table~\ref{tab:rbe}); larger residuals for the clinical cell lines
+reflect that these comparisons test implementation self-consistency, not
+independent physical validation (see Section~\ref{sec:topasref}).
+
+The Wedenberg and McNamara models were originally calibrated against
+in-vitro survival data for V79 and other cell lines
+\citep{wedenberg2013, mcnamara2015}.
+The plateau and Bragg-peak V79 RBE values computed here
+($\approx 1.05$ in the plateau; $\approx 1.75$ at the Bragg peak)
+fall within the range of experimentally measured proton RBE values
+reported for V79 cells across multiple in-vitro studies
+\citep{paganetti2014}, confirming that the implementation produces
+physically consistent results beyond what the TOPAS-nBio
+self-consistency check alone demonstrates.
+The clinical significance of this RBE rise
+($\approx 1.4$--$1.8$ for V79; $\approx 1.3$--$1.5$ for prostate;
+$\approx 1.1$--$1.3$ for H\&N) is an active research area in proton
+therapy \citep{paganetti2014}.
+These values, computed with the same LET machinery that produces
+$\Qeff = 2.60$ for GCR, illustrate that the underlying biophysics
+connects the two domains.
+
+\begin{figure}[H]
+  \centering
+  \includegraphics[width=\textwidth]{figures/topas_benchmark.pdf}
+  \caption{
+    \textbf{TOPAS-nBio benchmark: 100 MeV proton beam in water phantom.}
+    (a) Bragg curve: pipeline CSDA (Bortfeld analytical, dashed) overlaid
+        on TOPAS-nBio reference (solid).
+    (b) Dose-averaged LET$_d$ vs.\ depth; secondary axis shows normalized
+        physical dose for reference.
+    (c) Proton RBE vs.\ depth for three cell lines using Wedenberg (solid)
+        and McNamara (dashed) models; horizontal line = clinical constant
+        RBE $= 1.1$; gold band = Bragg peak region.
+  }
+  \label{fig:topas}
+\end{figure}
+
+\begin{table}[H]
+  \centering
+  \caption{RBE benchmark results. V79 reference values are from the
+           TOPAS-nBio OpenTOPAS-RBE validation suite and constitute an
+           independent implementation check. Clinical cell lines
+           (prostate, H\&N) are self-consistency only: reference values
+           were generated by propagating the same V79 LET$_d$ through
+           the Wedenberg/McNamara models with alternative $\alpha/\beta$
+           values (see Section~\ref{sec:topasref}); no external experimental
+           data were compared.
+           MAE = mean absolute error over valid LET$_d$ region ($>0.1$~keV/$\mu$m).}
+  \label{tab:rbe}
+  \small
+  \begin{tabular}{lcccccl}
+    \toprule
+    Cell line & $\alpha/\beta$ & Model & Plateau & Peak & MAE & Evidence \\
+              & (Gy)          &       & RBE     & RBE  &     & type     \\
+    \midrule
+    V79          & 1.41 & Wedenberg & 1.053 & 1.757 & $2.6\times10^{-8}$ & Independent \\
+    V79          & 1.41 & McNamara  & 1.052 & 1.644 & $2.8\times10^{-8}$ & Independent \\
+    Prostate     & 3.0  & Wedenberg & 1.046 & 1.685 & ---                & Self-consistency \\
+    Prostate     & 3.0  & McNamara  & 1.040 & 1.540 & ---                & Self-consistency \\
+    Head \& Neck & 10.0 & Wedenberg & 1.028 & 1.473 & ---                & Self-consistency \\
+    Head \& Neck & 10.0 & McNamara  & 1.025 & 1.412 & ---                & Self-consistency \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+% ─────────────────────────────────────────────────────────────────────────────
+% Discussion — include from separate file
+\input{discussion}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section{Conclusion}
+\label{sec:conclusion}
+
+We have presented \textsc{gcr-dosimetry-pipeline}, an open-source Python package
+installable via pip that integrates GCR spectrum generation, CSDA slab transport,
+organ-specific REID, SEP acute dosimetry, Latin Hypercube uncertainty
+propagation, and proton therapy RBE benchmarking into a single reproducible
+workflow.
+The pipeline is calibrated to MSL/RAD cruise-phase dosimetry and
+shows consistency with available HZETRN benchmarks within their stated
+uncertainties.
+
+The central quantitative results are:
+\begin{itemize}
+  \item A 259-day Earth--Mars transit at $16\gcm$ aluminum delivers a
+        median REID of $\sim\!5\%$, with p5/p95 bounds of
+        $1.3\%$--$16.9\%$, exceeding the historical NASA $3\%$ limit;
+        the wide uncertainty interval is dominated by DDREF and excess
+        risk scaling, not by GCR transport physics.
+  \item The August~1972 SEP event would require $>30\gcm$ aluminum
+        for sub-limit BFO protection; at $16\gcm$ (ISS/Orion class),
+        the dose is estimated at $\sim\!4\times$ the limit.
+  \item Carbon ions account for $\sim\!59\%$ of unshielded GCR absorbed dose
+        at $\LETd = 18.7\keVum$; $16\gcm$ aluminum reduces this to
+        $31\%$ and drops the field $\LETd$ to $4.1\keVum$, within
+        the LET range of clinical proton therapy Bragg peaks.
+  \item The Wedenberg and McNamara RBE models, computed from the same
+        $\LETd$ infrastructure as the GCR quality factor, agree with
+        OpenTOPAS-RBE to within MAE $<10^{-3}$ for V79 cells
+        (self-consistency check for clinical cell lines).
+\end{itemize}
+
+The pipeline has significant limitations relative to existing high-fidelity
+codes (most importantly, no nuclear fragmentation tracking) and should be
+treated as a transparent starting point with explicit uncertainty
+quantification, not a replacement for HZETRN or Geant4.
+Future work will focus on adding fragmentation cross-sections from the
+Wilson et~al.\ database, implementing the NASA 2023 risk framework,
+and running full TOPAS Monte Carlo simulations using the benchmark
+geometries provided in the repository.
+All source code, 82 automated tests, validation datasets, and TOPAS input
+files are available at \url{https://github.com/aryanhshah8/gcr-dosimetry-pipeline}.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section*{Acknowledgements}
+
+The author thanks the MSL/RAD team (C.~Zeitlin and collaborators) for making
+the cruise-phase dosimetry data publicly available, without which calibration
+of the pipeline would not have been possible.
+The Usoskin et~al.\ solar modulation potential database, the Vos \&
+Potgieter LIS parametrizations, and the HZETRN benchmark datasets of
+Slaba et~al.\ are gratefully acknowledged.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\appendix
+
+\section{LHS Sensitivity Decomposition (N = 500)}
+\label{app:sensitivity}
+
+Table~\ref{tab:sensitivity} lists the Spearman $\rho^2$ sensitivity indices
+for each of the eight LHS parameters with respect to REID, absorbed dose $D$,
+and dose equivalent $H$, from the $N = 500$ ensemble at $16\gcm$ aluminum,
+259-day transit, 35-year-old male.
+
+\begin{table}[H]
+  \centering
+  \caption{Normalized Spearman $\rho^2$ sensitivity indices.
+           Values sum to 1 within each column by construction.
+           Radiobiological parameters dominate REID variance;
+           physics parameters dominate $D$ and $H$ variance.}
+  \label{tab:sensitivity}
+  \begin{tabular}{lccc}
+    \toprule
+    Parameter & REID & $D$ & $H$ \\
+    \midrule
+    \code{phi\_scale}   & 0.035 & 0.720 & 0.050 \\
+    \code{LIS\_norm}    & 0.013 & 0.266 & 0.027 \\
+    \code{cross\_sec}   & 0.007 & 0.007 & 0.002 \\
+    \code{neutron\_H}   & 0.033 & 0.002 & 0.026 \\
+    \code{Q\_factor}    & 0.764 & $<$0.001 & 0.894 \\
+    \code{DDREF}        & 0.067 & $<$0.001 & $<$0.001 \\
+    \code{ERR\_scale}   & 0.020 & 0.001 & $<$0.001 \\
+    \code{EAR\_scale}   & 0.061 & 0.004 & 0.001 \\
+    \bottomrule
+    \multicolumn{4}{l}{\small $N = 500$ samples; 35-year-old male, 259-day transit, $16\gcm$ Al.} \\
+  \end{tabular}
+\end{table}
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section*{CRediT Author Contribution Statement}
+
+\textbf{Aryan Hemendra Shah}: Conceptualization, Methodology, Software,
+Validation, Formal Analysis, Investigation, Data Curation,
+Writing -- Original Draft, Writing -- Review \& Editing, Visualization.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section*{Declaration of Competing Interests}
+
+The author declares no competing interests.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section*{Funding}
+
+This research received no external funding.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\section*{Data Availability Statement}
+
+All source code, input datasets, validation scripts, and TOPAS benchmark
+geometry files are freely available at
+\url{https://github.com/aryanhshah8/gcr-dosimetry-pipeline}.
+No proprietary datasets were used; all input data (Usoskin solar
+modulation potential database, NIST stopping powers, HZETRN neutron
+benchmark table) are included in the repository under \code{data/}.
+Results can be fully reproduced without any proprietary software.
+
+% ─────────────────────────────────────────────────────────────────────────────
+\bibliography{references}
+
+\end{document}

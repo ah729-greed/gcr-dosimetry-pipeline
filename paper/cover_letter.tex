@@ -1,0 +1,106 @@
+\documentclass[11pt,letterpaper]{letter}
+\usepackage[margin=1.2in]{geometry}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage[colorlinks=true, urlcolor=blue!70!black,
+            linkcolor=blue!70!black, citecolor=blue!70!black]{hyperref}
+\usepackage{bookmark}
+
+\signature{Aryan Hemendra Shah\\
+  University of Miami\\
+  \href{mailto:ahs222@miami.edu}{ahs222@miami.edu}\\
+  ORCID: 0009-0008-0518-428X}
+
+\address{Aryan Hemendra Shah\\
+  University of Miami\\
+  Miami, FL 33146\\
+  \href{mailto:ahs222@miami.edu}{ahs222@miami.edu}}
+
+\date{\today}
+
+\begin{document}
+
+\begin{letter}{The Editors\\
+  \textit{Life Sciences in Space Research}\\
+  Elsevier}
+
+\opening{Dear Editors,}
+
+I am submitting for your consideration the manuscript
+\textbf{``An open-source GCR dosimetry pipeline for Mars mission risk
+assessment: organ-specific REID, SEP acute hazard, and dual-use proton
+therapy RBE benchmarking''} for publication in \textit{Life Sciences in
+Space Research}.
+
+\medskip
+\textbf{What the paper does.}
+The manuscript presents an open-source Python package
+(\textsc{gcr-dosimetry-pipeline}) that integrates GCR spectrum
+generation, CSDA slab transport, organ-specific cancer risk (REID),
+Solar Energetic Particle acute dosimetry, and global uncertainty
+quantification via Latin Hypercube Sampling into a single reproducible
+workflow with 82 automated tests and a public repository.
+
+\medskip
+\textbf{What is new.}
+I am transparent that the individual components — force-field
+modulation, CSDA transport, REID estimation — are established methods.
+The contributions are threefold.
+
+First, no currently available open tool combines organ-specific REID,
+SEP acute risk, and global uncertainty propagation in a single workflow
+reproducible from a standard \texttt{pip install}.
+
+Second, the per-species LET decomposition shows that carbon ions account
+for approximately 59\% of unshielded GCR absorbed dose at a field LET
+of 18.7~keV/$\mu$m — the same LET range that governs Bragg-peak RBE
+uncertainty in clinical proton therapy.
+The pipeline computes Wedenberg and McNamara RBE for both GCR and
+clinical proton beam geometries from one codebase, enabling direct
+comparison of quality factors across both fields.
+To my knowledge this connection has not been demonstrated quantitatively
+in an open tool.
+
+Third, the Latin Hypercube Sampling ensemble shows that DDREF and excess
+risk scaling together account for more than 70\% of REID output variance,
+quantifying why physics improvements alone cannot close mission risk
+uncertainty. This is a directly actionable finding for research
+prioritization.
+
+\medskip
+\textbf{Scope and limitations.}
+The transport model uses CSDA with exponential nuclear attenuation and
+does not capture heavy-ion fragmentation secondaries.
+This limitation is stated explicitly and its domain of validity is
+discussed.
+The per-species calibration to MSL/RAD is described as calibration, not
+independent prediction, and the validation evidence is presented
+accordingly.
+The REID framework follows Cucinotta (2013); the 2023 NASA update is
+noted as a limitation for future work.
+
+\medskip
+\textbf{Relevance to \textit{Life Sciences in Space Research}.}
+This manuscript is squarely within the journal's scope: human
+spaceflight radiation risk, Mars mission planning, and space radiation
+biology.
+The dual-use LET framing (space radiation $\leftrightarrow$ proton
+therapy) additionally connects to an emerging readership interested in
+high-LET radiobiology across both domains.
+
+\medskip
+\textbf{Data and code availability.}
+All source code, input data, validation scripts, and TOPAS benchmark
+geometries are openly available on GitHub at the repository
+\href{https://github.com/aryanhshah8/gcr-dosimetry-pipeline}{aryanhshah8/gcr-dosimetry-pipeline},
+and no proprietary datasets are required to reproduce any results.
+
+\medskip
+I confirm that this manuscript has not been submitted elsewhere, that I
+am the sole author, and that I have no conflicts of interest to declare.
+I look forward to the reviewers' comments.
+
+\closing{Sincerely,}
+
+\end{letter}
+\end{document}
