@@ -6,7 +6,7 @@ This repository accompanies the manuscript:
 
 > Shah, A. H. (2025). *An open-source GCR dosimetry pipeline for Mars mission risk assessment: organ-specific REID, SEP acute hazard, and dual-use proton therapy RBE benchmarking.* Submitted to *Life Sciences in Space Research*.
 
-The point of this tool is to offer a quicker, albeit less accurate, alternative to HZETRN and Geant4. The point is that those tools are closed, hard to install, and don't come with uncertainty quantification built in. This one does, and anyone with Python can run it.
+The point of this tool is to offer a quicker, tranparent, and reproducable alternative to HZETRN and Geant4. The point is that those tools are closed, hard to install, and don't come with uncertainty quantification built in. This one does, and anyone with Python can run it.
 
 ---
 
